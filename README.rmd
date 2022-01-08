@@ -1,0 +1,73 @@
+---
+title: "Cell Towers Brazil"
+author: Rafael Lopes (@rafalpx)
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Cell Towers
+
+This is a repository to codes and plots of cell towers in Brazilian territories. From the [opencellid.org](opencellid.org) you can download the data for the exact location of each cell tower by type. In this repository there is a copy of the data set the file '724.csv.gz'. Filtering this '.csv' on the extent of the desired administrative cut you can plot easily the cell towers location on a map.
+
+The Following sections gives examples on how to plot filter and plot on any Brazilian extent using the `{r}` package `geobr`.
+
+## Necessary Libraries
+
+```{r libraries}
+library(dplyr)
+library(readr)
+library(ggplot2)
+library(ggtext)
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(geobr)
+
+#Functions to take the IBGE codes of State Capitals
+source("Functions/functions.R")
+```
+
+## Filtering on Cell Towers dataset
+
+On the dataset filtering the extent of Brazil, before we set up the CRS of the `celltowers` dataframe:
+
+```{r filtering, echo=FALSE}
+## Setting the CRS for the celltowers dataset
+celltowers <- read_csv("724.csv.gz")|> 
+  sf::st_as_sf(coords = c("lon", "lat"), crs = 4326)
+
+## Getting the extent of Brasil
+brasil <- ne_countries(scale = 'medium', type = 'map_units', returnclass = 'sf') |>
+  filter(name == 'Brazil')
+
+## Filtering towers by type
+### 3G
+UMTS <- celltowers |> 
+  filter(radio == "UMTS") |>
+  st_intersection(brasil)
+### 4G
+LTE <- celltowers |> 
+  filter(radio == "LTE") |>
+  st_intersection(brasil)
+```
+
+## Plots
+
+```{r plots}
+## A Quick plot of the extent
+ggplot() + 
+  geom_sf(data = brasil)
+
+## A plot of celltowers on the map
+ggplot() + 
+  geom_sf(data = brasil, fill = "black", color = "white", size = 0.3) + 
+  geom_sf(data = UMTS, shape = ".", color = "#4d88ff", alpha = 0.3) +
+  geom_sf(data = LTE, shape = ".", color = "#cc0000", alpha = 0.5)
+
+## Saving the plot
+ggsave("my_plot_br.png", plot = x, height = 7, width = 7)
+```
+
