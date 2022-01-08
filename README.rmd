@@ -34,7 +34,7 @@ source("Functions/functions.R")
 
 On the dataset filtering the extent of Brazil, before we set up the CRS of the `celltowers` dataframe:
 
-```{r filtering, echo=FALSE}
+```{r filtering}
 ## Setting the CRS for the celltowers dataset
 celltowers <- read_csv("724.csv.gz")|> 
   sf::st_as_sf(coords = c("lon", "lat"), crs = 4326)
@@ -68,6 +68,6 @@ ggplot() +
   geom_sf(data = LTE, shape = ".", color = "#cc0000", alpha = 0.5)
 
 ## Saving the plot
-ggsave("my_plot_br.png", plot = x, height = 7, width = 7)
+# ggsave("my_plot_br.png", height = 7, width = 7) 
 ```
 
