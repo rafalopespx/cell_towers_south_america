@@ -149,12 +149,18 @@ capitals_code<-c(4314902, 4205407, 4106902, #Regiao Sul
                  1200401, 1302603, 1501402, 1400100, 1600303, 1100205, 1721000, # Regiao Norte
                  2111300, 2211001, 2408102, 2611606, 2507507, 2704302, 2800308, 2927408, 2304400 # Regiao Nordeste
 )
+capitals_code<-as.data.frame(capitals_code)
+
+capitals_code<-capitals_code %>% 
+  mutate(code_muni = substr(capitals_code, 1, 6))
+
+capitals<-br_municipality %>% 
+  filter(code_muni %in% capitals_code$capitals_code)
 
 plot_list<-vector("list", 27)
 
-for (i in capitals_code) {
-  municipality<-br_municipality %>% 
-    filter(code_muni == i)
+for (i in 1:length(capitals_code)) {
+  municipality<-capitals[i,]
   
   UMTS_city <- celltowers |> 
     filter(radio == "UMTS") |>
