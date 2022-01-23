@@ -1,3 +1,28 @@
+plot_func<-function(city, 
+                    UMTS_city, 
+                    LTE_city, 
+                    city_name){
+  x_st <- ggplot() + 
+    geom_sf(data = city, fill = "black", color = "white", size = 0.3)+
+    geom_sf(data = UMTS_city, shape = ".", color = "#4d88ff", alpha = 0.3) +
+    geom_sf(data = LTE_city, shape = ".", color = "#cc0000", alpha = 0.5)
+  theme_void() +
+    labs(
+      title = "<span style='color: white; text-align: center;'>Distribuição de torres de celular <br> <span style='color: #cc0000'>4G</span> (LTE) e <span style='color: #4d88ff'>3G</span> (UMTS)</span>",
+      subtitle = paste0("<span style='color: white; text-align: center;'> Cidade de ", city_name, " </span>"),
+      caption = "<span style='color: white;'> Feito por Rafael Lopes <b>&middot;</b> <br>Data from opencellid.org </span></br>"
+    ) +
+    theme(
+      plot.background = element_rect(fill = "black"),
+      panel.background = element_rect(fill = "black"),
+      plot.title = element_markdown(margin = margin(t = 40, b = -60, l = 10), size = 20),
+      plot.subtitle = element_markdown(margin = margin(t = 60, b = -120, l = 20), size = 10),
+      plot.caption = element_markdown(hjust = 0, margin = margin(r = -10, b = 20, t = -30)),
+      text = element_text(family = "Roboto Condensed")
+    )
+  return(x_st)
+}
+
 is.capital<-function(x = NULL, metro_capitals = FALSE){
   require(geobr)
   # library(MASS)
