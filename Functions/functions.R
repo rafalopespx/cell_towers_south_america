@@ -5,7 +5,7 @@ plot_func<-function(city,
   x_st <- ggplot() + 
     geom_sf(data = city, fill = "black", color = "white", size = 0.3)+
     geom_sf(data = UMTS_city, shape = ".", color = "#4d88ff", alpha = 0.3) +
-    geom_sf(data = LTE_city, shape = ".", color = "#cc0000", alpha = 0.5)
+    geom_sf(data = LTE_city, shape = ".", color = "#cc0000", alpha = 0.5)+
   theme_void() +
     labs(
       title = "<span style='color: white; text-align: center;'>Distribuição de torres de celular <br> <span style='color: #cc0000'>4G</span> (LTE) e <span style='color: #4d88ff'>3G</span> (UMTS)</span>",

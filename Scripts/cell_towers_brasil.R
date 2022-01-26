@@ -1,3 +1,5 @@
+rm(list=ls())
+
 library(dplyr)
 library(readr)
 library(ggplot2)
@@ -6,10 +8,12 @@ library(sf)
 library(rnaturalearth)
 library(rnaturalearthdata)
 library(geobr)
+library(stringr)
+library(vroom)
 
 source("Functions/functions.R")
 
-celltowers_br <- read_csv("Data/724.csv.gz")|> 
+celltowers_br <- read_csv("Data/brasil_cell_towers.csv.gz")|> 
   sf::st_as_sf(coords = c("lon", "lat"), crs = 4326)
 
 brasil <- ne_countries(scale = 'medium', type = 'map_units', returnclass = 'sf') |>
@@ -53,7 +57,7 @@ x
 
 br_states<-read_state(code_state = "all", year = 2010, simplified = T, showProgress = F)
 br_states<-br_states %>% 
-  st_transform(crs = st_crs(celltowers))
+  st_transform(crs = st_crs(celltowers_br))
 
 
 #Portugues Legend
@@ -115,7 +119,7 @@ for (i in unique(br_states$abbrev_state)) {
 
 br_municipality<-read_municipality(code_muni = "all", year = 2010, simplified = T, showProgress = F)
 br_municipality<-br_municipality %>% 
-  st_transform(crs = st_crs(celltowers))
+  st_transform(crs = st_crs(celltowers_br))
 
 #Capitals
 capitals_code<-c(4314902, 4205407, 4106902, #Regiao Sul 
@@ -134,43 +138,30 @@ capitals<-br_municipality %>%
 
 plot_list<-vector("list", 27)
 
-for (i in 1:length(capitals_code)) {
-  municipality<-capitals[i,]
+for (i in 1:nrow(capitals_code)) {
+  municipality<-capitals[i,]|>
+    st_transform(crs = st_crs(celltowers_br))
   
-  UMTS_city <- celltowers |> 
+  UMTS_city <- celltowers_br |> 
     filter(radio == "UMTS") |>
     st_intersection(municipality)
   
-  LTE_city <- celltowers |> 
+  LTE_city <- celltowers_br |> 
     filter(radio == "LTE") |>
     st_intersection(municipality)
   
-  x_st <- ggplot() + 
-    geom_sf(data = city, fill = "black", color = "white", size = 0.3)+
-    geom_sf(data = UMTS_city, shape = ".", color = "#4d88ff", alpha = 0.3) +
-    geom_sf(data = LTE_city, shape = ".", color = "#cc0000", alpha = 0.5)
-  theme_void() +
-    labs(
-      title = "<span style='color: white; text-align: center;'>Distribuição de torres de celular <br> <span style='color: #cc0000'>4G</span> (LTE) e <span style='color: #4d88ff'>3G</span> (UMTS)</span>",
-      subtitle = paste0("<span style='color: white; text-align: center;'> Cidade de ", city_name, " </span>"),
-      caption = "<span style='color: white;'> Feito por Rafael Lopes <b>&middot;</b> <br>Data from opencellid.org </span></br>"
-    ) +
-    theme(
-      plot.background = element_rect(fill = "black"),
-      panel.background = element_rect(fill = "black"),
-      plot.title = element_markdown(margin = margin(t = 40, b = -60, l = 10), size = 20),
-      plot.subtitle = element_markdown(margin = margin(t = 60, b = -120, l = 20), size = 10),
-      plot.caption = element_markdown(hjust = 0, margin = margin(r = -10, b = 20, t = -30)),
-      text = element_text(family = "Roboto Condensed")
-    )
+  plot_list[[i]]<-plot_func(city = municipality,
+            UMTS_city = UMTS_city,
+            LTE_city = LTE_city,
+            city_name = municipality$name_muni)
   
-  # plot_list[[i]]<-plot_func(city = municipality, 
-  #           UMTS_city = UMTS_city, 
-  #           LTE_city = LTE_city, 
-  #           city_name = municipality$name_muni)
+  ggsave(paste0("plots/Capitals/plot_capital_", municipality$name_muni, ".png"), 
+         plot = plot_list[[i]], 
+         height = 7, width = 7)
   
-  # ggsave(paste0("plots/Capitals/plot_capital_", i, ".png"), plot = plot_list[[i]], height = 7, width = 7)
-}
+  print(paste0(municipality$name_muni, " finished!"))
+
+  }
 
 #
 
