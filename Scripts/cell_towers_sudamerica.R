@@ -60,11 +60,14 @@ for (i in 1:n_countries) {
   plots_dark[[i]]<-ggplot() + 
     geom_sf(data = countries[[i]], fill = "black", color = "white", size = 0.3) + 
     geom_sf(data = UMTS_list[[i]], shape = ".", color = "#4d88ff", alpha = 0.3) +
-    geom_sf(data = LTE_list[[i]], shape = ".", color = "#cc0000", alpha = 0.5)
+    geom_sf(data = LTE_list[[i]], shape = ".", color = "#cc0000", alpha = 0.5)+
+    theme_void()
   
   ggsave(paste0("plots/South America/", names_countries[i], "_cell_towers.png"), 
          plot = plots_dark[[i]], 
          height = 7, width = 7)
+  
+  print(paste0(names_countries[i], " finished!"))
   
 }
 
@@ -111,6 +114,10 @@ ggplot()+
   geom_sf(data = countries$Peru, fill = "black", color = "white", size = 0.3)+
   geom_sf(data = UMTS_list$Peru,shape = ".", color = "#4d88ff", alpha = 0.3) +
   geom_sf(data = LTE_list$Peru, shape = ".", color = "#cc0000", alpha = 0.5)+
+  ## Suriname
+  geom_sf(data = countries$Suriname, fill = "black", color = "white", size = 0.3)+
+  geom_sf(data = UMTS_list$Suriname,shape = ".", color = "#4d88ff", alpha = 0.3) +
+  geom_sf(data = LTE_list$Suriname, shape = ".", color = "#cc0000", alpha = 0.5)+
   ## Uruguay
   geom_sf(data = countries$Uruguay, fill = "black", color = "white", size = 0.3)+
   geom_sf(data = UMTS_list$Uruguay,shape = ".", color = "#4d88ff", alpha = 0.3) +
